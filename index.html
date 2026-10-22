@@ -1,1 +1,1058 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>musake project - Gallery & Photo Inspiration</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        musake: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            dark: '#0f0f12',
+                            cardDark: '#1c1c21',
+                            cardHoverDark: '#26262e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom CSS untuk Layout Masonry Multi-Kolom */
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 18px;
+        }
+        @media (min-width: 640px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        @media (min-width: 768px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 4;
+            }
+        }
+        @media (min-width: 1280px) {
+            .masonry-grid {
+                column-count: 5;
+            }
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 18px;
+        }
 
+        /* Scrollbar custom */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-musake-dark text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300">
+
+    <!-- NAVBAR HEADER BRANDING -->
+    <header class="sticky top-0 z-40 bg-white/85 dark:bg-musake-dark/85 backdrop-blur-md px-4 py-3 border-b border-gray-200/80 dark:border-gray-800/80 transition-colors">
+        <div class="max-w-[1800px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
+            
+            <!-- Logo Brand 'musake project' -->
+            <a href="#" onclick="filterCategory('Semua')" class="flex items-center gap-3 group shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-musake-700 via-musake-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-musake-600/30 group-hover:scale-105 transition duration-300">
+                    <i class="fa-solid fa-shapes text-xl"></i>
+                </div>
+                <div class="hidden sm:block">
+                    <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-musake-700 via-indigo-600 to-violet-500 dark:from-violet-400 dark:to-indigo-300 bg-clip-text text-transparent">
+                        musake
+                    </span>
+                    <span class="text-xs font-semibold block -mt-1 text-gray-500 dark:text-gray-400 tracking-widest uppercase">
+                        project
+                    </span>
+                </div>
+            </a>
+
+            <!-- Search Bar Realtime -->
+            <div class="flex-1 max-w-2xl relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Cari karya di musake project (misal: Fotografi, Arsitektur)..." 
+                    class="w-full bg-gray-100 dark:bg-musake-cardDark text-gray-800 dark:text-gray-200 pl-11 pr-10 py-2.5 rounded-full text-sm font-medium border border-transparent focus:border-musake-500/50 focus:bg-white dark:focus:bg-musake-cardHoverDark focus:outline-none focus:ring-4 focus:ring-musake-500/10 transition">
+                <button id="clearSearch" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <!-- Tombol Open Editor Studio -->
+                <button id="openHeaderEditorBtn" class="bg-gray-100 dark:bg-musake-cardDark hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold px-3.5 py-2.5 rounded-full text-xs sm:text-sm transition flex items-center gap-2 border border-gray-200 dark:border-gray-800">
+                    <i class="fa-solid fa-wand-magic-sparkles text-musake-600 dark:text-violet-400"></i>
+                    <span class="hidden sm:inline">Studio Edit</span>
+                </button>
+
+                <!-- Tombol Upload Foto -->
+                <button id="openUploadModalBtn" class="bg-gradient-to-r from-musake-600 to-indigo-600 hover:from-musake-700 hover:to-indigo-700 text-white font-semibold px-4 py-2.5 rounded-full text-xs sm:text-sm shadow-md shadow-musake-600/25 transition transform active:scale-95 flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span class="hidden md:inline">Unggah Karya</span>
+                </button>
+
+                <!-- Toggle Dark / Light Mode -->
+                <button id="darkModeToggle" class="p-2.5 rounded-full bg-gray-100 dark:bg-musake-cardDark hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition" title="Ganti Mode Tampilan">
+                    <i class="fa-solid fa-moon text-lg dark:hidden"></i>
+                    <i class="fa-solid fa-sun text-lg hidden dark:inline text-amber-400"></i>
+                </button>
+
+                <!-- Profile Avatar -->
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-musake-500 p-0.5 cursor-pointer shadow" title="Profil Pengguna">
+                    <div class="w-full h-full bg-white dark:bg-musake-cardDark rounded-full flex items-center justify-center font-bold text-xs text-musake-700 dark:text-violet-300">
+                        MP
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CATEGORY CHIPS FILTER -->
+    <nav class="max-w-[1800px] mx-auto px-4 py-3">
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="categoryContainer">
+            <!-- Dynamic Category Chips Injected via JS -->
+        </div>
+    </nav>
+
+    <!-- MAIN GALLERY MASONRY -->
+    <main class="max-w-[1800px] mx-auto px-4 py-2 min-h-[75vh]">
+        <div id="pinsGrid" class="masonry-grid">
+            <!-- Pin Items Will Be Injected Here -->
+        </div>
+
+        <!-- Empty State (Ketika pencarian/filter tidak ditemukan) -->
+        <div id="emptyState" class="hidden text-center py-24 px-4">
+            <div class="w-20 h-20 bg-musake-100 dark:bg-musake-cardDark text-musake-600 dark:text-violet-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">Tidak ada foto ditemukan</h3>
+            <p class="text-gray-500 dark:text-gray-400 mt-1 max-w-md mx-auto text-sm">Coba kata kunci lain atau unggah foto pertama Anda ke koleksi <b>musake project</b>!</p>
+            <button onclick="filterCategory('Semua')" class="mt-5 bg-musake-600 hover:bg-musake-700 text-white font-semibold px-6 py-2.5 rounded-full text-sm transition">
+                Tampilkan Semua Karya
+            </button>
+        </div>
+    </main>
+
+    <!-- MODAL DETAIL FOTO -->
+    <div id="pinModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="relative bg-white dark:bg-musake-cardDark w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col md:flex-row border border-gray-100 dark:border-gray-800">
+            
+            <!-- Close Modal Button -->
+            <button id="closeModal" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black rounded-full flex items-center justify-center text-gray-800 dark:text-gray-200 transition shadow-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Image Container (Kiri) -->
+            <div class="w-full md:w-3/5 bg-gray-950 flex items-center justify-center p-3 relative min-h-[300px]">
+                <img id="modalImage" src="" alt="Detail Karya" class="w-full max-h-[75vh] object-contain rounded-2xl">
+            </div>
+
+            <!-- Details & Interactivity (Kanan) -->
+            <div class="w-full md:w-2/5 p-6 flex flex-col justify-between overflow-y-auto max-h-[75vh] md:max-h-[92vh]">
+                <div>
+                    <!-- Header Action Buttons -->
+                    <div class="flex items-center justify-between mb-6 pr-10">
+                        <div class="flex items-center gap-1.5 sm:gap-2">
+                            <button id="modalLikeBtn" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition" title="Sukai">
+                                <i id="modalLikeIcon" class="fa-regular fa-heart text-xl"></i>
+                            </button>
+                            <button id="modalEditBtn" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition text-musake-600 dark:text-violet-400" title="Edit Foto">
+                                <i class="fa-solid fa-sliders text-xl"></i>
+                            </button>
+                            <button id="modalShareBtn" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition" title="Bagikan Foto">
+                                <i class="fa-solid fa-share-nodes text-xl"></i>
+                            </button>
+                            <a id="downloadBtn" href="#" target="_blank" download class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition" title="Unduh">
+                                <i class="fa-solid fa-download text-xl"></i>
+                            </a>
+                        </div>
+                        <button id="modalSaveBtn" class="bg-musake-600 hover:bg-musake-700 text-white px-5 py-2 rounded-full font-semibold transition text-sm flex items-center gap-2 shadow-md shadow-musake-600/30">
+                            <span>Simpan</span>
+                        </button>
+                    </div>
+
+                    <!-- Title & Description -->
+                    <span id="modalCategoryTag" class="inline-block text-xs font-bold text-musake-600 dark:text-violet-400 bg-musake-50 dark:bg-musake-500/10 px-3 py-1 rounded-full mb-3">
+    <!-- MODAL STUDIO EDIT FOTO (FULL FEATURED PHOTO EDITOR) -->
+    <div id="editorModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-lg flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="relative bg-white dark:bg-musake-cardDark w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[95vh] flex flex-col lg:flex-row border border-gray-100 dark:border-gray-800">
+            
+            <!-- Close Modal -->
+            <button id="closeEditorModal" class="absolute top-4 right-4 z-20 w-10 h-10 bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black rounded-full flex items-center justify-center text-gray-800 dark:text-gray-200 transition shadow-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Editor Preview Viewport (Kiri) -->
+            <div class="w-full lg:w-2/3 bg-gray-950 flex flex-col items-center justify-center p-4 sm:p-8 relative min-h-[350px] lg:min-h-[550px]">
+                <!-- Interactive Live Image View -->
+                <div class="relative max-w-full max-h-[60vh] flex items-center justify-center overflow-hidden rounded-2xl shadow-2xl">
+                    <img id="editorPreviewImg" src="" alt="Editor Preview" class="max-w-full max-h-[58vh] object-contain transition-all duration-150">
+                    
+                    <!-- Overlay Text Dynamic -->
+                    <div id="editorOverlayTextDisplay" class="absolute pointer-events-none text-white font-extrabold text-2xl drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] text-center px-4 hidden">
+                    </div>
+                </div>
+
+                <!-- Control Quick Transform Buttons -->
+                <div class="flex items-center gap-2 sm:gap-3 mt-4 bg-gray-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-gray-800 text-white text-xs">
+                    <button id="rotateLeftBtn" class="hover:text-violet-400 p-1.5 transition" title="Rotasi Kiri"><i class="fa-solid fa-rotate-left"></i> -90°</button>
+                    <div class="w-px h-4 bg-gray-700"></div>
+                    <button id="rotateRightBtn" class="hover:text-violet-400 p-1.5 transition" title="Rotasi Kanan"><i class="fa-solid fa-rotate-right"></i> +90°</button>
+                    <div class="w-px h-4 bg-gray-700"></div>
+                    <button id="flipHBtn" class="hover:text-violet-400 p-1.5 transition" title="Flip Horizontal"><i class="fa-solid fa-arrows-left-right"></i> Flip H</button>
+                    <div class="w-px h-4 bg-gray-700"></div>
+                    <button id="flipVBtn" class="hover:text-violet-400 p-1.5 transition" title="Flip Vertikal"><i class="fa-solid fa-arrows-up-down"></i> Flip V</button>
+                    <div class="w-px h-4 bg-gray-700"></div>
+                    <button id="resetEditorBtn" class="hover:text-red-400 p-1.5 transition font-bold text-red-400" title="Reset Semua"><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
+                </div>
+            </div>
+
+            <!-- Editor Sidebar Controls (Kanan) -->
+            <div class="w-full lg:w-1/3 p-5 sm:p-6 flex flex-col justify-between overflow-y-auto max-h-[50vh] lg:max-h-[92vh] border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-gray-800">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-musake-600 text-white flex items-center justify-center text-xs font-bold shadow">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Studio Edit Foto</h3>
+                        </div>
+                        <span class="text-[10px] uppercase font-bold text-musake-600 dark:text-violet-400 bg-musake-50 dark:bg-musake-500/10 px-2.5 py-1 rounded-full">musake lab</span>
+                    </div>
+
+                    <!-- Presets Filter Tabs -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Preset Filter</label>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button onclick="applyPreset('original')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Original</button>
+                            <button onclick="applyPreset('vintage')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Vintage</button>
+                            <button onclick="applyPreset('cyberpunk')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Cyber</button>
+                            <button onclick="applyPreset('bw')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Hitam Putih</button>
+                            <button onclick="applyPreset('warm')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Warm Sun</button>
+                            <button onclick="applyPreset('cool')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Cool Cyan</button>
+                            <button onclick="applyPreset('dramatic')" class="px-2 py-2 rounded-xl text-[11px] font-bold bg-gray-100 dark:bg-gray-800 hover:bg-musake-600 hover:text-white transition dark:text-gray-200 truncate">Drama</button>
+                        </div>
+                    </div>
+
+                    <!-- Sliders Penyesuaian -->
+                    <div class="space-y-3">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Penyesuaian Manual</label>
+                        
+                        <!-- Brightness -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                                <span>Kecerahan (Brightness)</span>
+                                <span id="valBrightness">100%</span>
+                            </div>
+                            <input type="range" id="sliderBrightness" min="0" max="200" value="100" class="w-full accent-musake-600 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Contrast -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                                <span>Kontras (Contrast)</span>
+                                <span id="valContrast">100%</span>
+                            </div>
+                            <input type="range" id="sliderContrast" min="0" max="200" value="100" class="w-full accent-musake-600 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Saturation -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                                <span>Saturasi (Saturation)</span>
+                                <span id="valSaturation">100%</span>
+                            </div>
+                            <input type="range" id="sliderSaturation" min="0" max="200" value="100" class="w-full accent-musake-600 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Blur -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                                <span>Kebureman (Blur)</span>
+                                <span id="valBlur">0px</span>
+                            </div>
+                            <input type="range" id="sliderBlur" min="0" max="10" value="0" step="0.5" class="w-full accent-musake-600 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Sepia -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                                <span>Sepia</span>
+                                <span id="valSepia">0%</span>
+                            </div>
+                            <input type="range" id="sliderSepia" min="0" max="100" value="0" class="w-full accent-musake-600 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Hue Rotate -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                                <span>Rotasi Warna (Hue)</span>
+                                <span id="valHue">0°</span>
+                            </div>
+                            <input type="range" id="sliderHue" min="0" max="360" value="0" class="w-full accent-musake-600 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Overlay Teks / Watermark Optional -->
+                    <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Tambahkan Teks / Watermark</label>
+                        <input type="text" id="editorTextInput" placeholder="Contoh: musake project 2026" class="w-full bg-gray-100 dark:bg-gray-800 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-musake-500 text-gray-800 dark:text-white">
+                    </div>
+                </div>
+
+                <!-- Export / Save Action Buttons -->
+                <div class="pt-5 mt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                    <button id="saveEditedToGalleryBtn" class="w-full bg-musake-600 hover:bg-musake-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-musake-600/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Simpan Karya Baru ke musake project</span>
+                    </button>
+                    <button id="downloadEditedImageBtn" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh Foto Hasil Edit (PNG)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UPLOAD FOTO BARU -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-musake-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 relative border border-gray-100 dark:border-gray-800">
+            <button id="closeUploadModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-8 h-8 rounded-xl bg-musake-600 text-white flex items-center justify-center text-sm font-bold">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Unggah Karya ke musake project</h3>
+            </div>
+
+            <form id="uploadForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Judul Foto *</label>
+                    <input type="text" id="uploadTitle" required placeholder="Contoh: Arsitektur Kota Modern" class="w-full bg-gray-100 dark:bg-gray-800 border-0 rounded-2xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-musake-500 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">URL Gambar (Unsplash/Direct Link) *</label>
+                    <input type="url" id="uploadUrl" required placeholder="https://images.unsplash.com/..." class="w-full bg-gray-100 dark:bg-gray-800 border-0 rounded-2xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-musake-500 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Kategori *</label>
+                    <select id="uploadCategory" class="w-full bg-gray-100 dark:bg-gray-800 border-0 rounded-2xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-musake-500 dark:text-white">
+                        <option value="Fotografi">Fotografi</option>
+                        <option value="Arsitektur">Arsitektur</option>
+                        <option value="Alam">Alam</option>
+                        <option value="Desain">Desain</option>
+                        <option value="Kuliner">Kuliner</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Nama Kreator</label>
+                    <input type="text" id="uploadAuthor" placeholder="Nama Kamu (opsional)" class="w-full bg-gray-100 dark:bg-gray-800 border-0 rounded-2xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-musake-500 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Deskripsi Foto</label>
+                    <textarea id="uploadDescription" rows="3" placeholder="Ceritakan kisah singkat dibalik foto ini..." class="w-full bg-gray-100 dark:bg-gray-800 border-0 rounded-2xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-musake-500 dark:text-white"></textarea>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-musake-600 hover:bg-musake-700 text-white font-bold py-3 rounded-2xl text-sm transition shadow-lg shadow-musake-600/30">
+                        Publikasikan Foto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-semibold">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-violet-400 dark:text-musake-600"></i>
+        <span id="toastMessage">Pesan Toast</span>
+    </div>
+
+    <!-- FOOTER BRANDING -->
+    <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 text-center text-xs text-gray-500 dark:text-gray-400">
+        <p class="font-semibold text-gray-700 dark:text-gray-300">musake project &copy; 2026</p>
+        <p class="mt-1">Galeri Inspirasi & Kreativitas Visual Tanpa Batas</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Data Pin Awal Galeri
+        const initialPins = [
+            {
+                id: 'pin-1',
+                title: 'Arsitektur Modern Minimalis',
+                description: 'Desain fasad bangunan dengan konsep geometri bersih dan pencahayaan natural yang menawan.',
+                category: 'Arsitektur',
+                imageUrl: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&auto=format&fit=crop&q=80',
+                author: 'Elena Rostova',
+                authorAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+                likes: 142,
+                isLiked: false,
+                isSaved: false,
+                comments: ['Luar biasa pencahayaannya!', 'Konsep visual yang menginspirasi.']
+            },
+            {
+                id: 'pin-2',
+                title: 'Keindahan Alam Pegunungan',
+                description: 'Kabut tipis menyelimuti lereng bukit saat matahari terbit di dataran tinggi.',
+                category: 'Alam',
+                imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
+                author: 'Marvin McKinney',
+                authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+                likes: 89,
+                isLiked: false,
+                isSaved: true,
+                comments: ['Pemandangan yang sangat menenangkan.']
+            },
+            {
+                id: 'pin-3',
+                title: 'Kopi & Estetika Kerja',
+                description: 'Suasana meja kerja minimalis dengan secangkir kopi hangat di pagi hari.',
+                category: 'Kuliner',
+                imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop&q=80',
+                author: 'Sophia Chen',
+                authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                likes: 210,
+                isLiked: true,
+                isSaved: false,
+                comments: ['Suka sekali mood foto ini!']
+            },
+            {
+                id: 'pin-4',
+                title: 'Seni Abstrak Modern',
+                description: 'Eksplorasi bentuk geometri dan komposisi warna kontras tinggi.',
+                category: 'Desain',
+                imageUrl: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&auto=format&fit=crop&q=80',
+                author: 'Lucas Vance',
+                authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+                likes: 67,
+                isLiked: false,
+                isSaved: false,
+                comments: []
+            }
+        ];
+
+        // State Aplikasi Global
+        let pinsData = [...initialPins];
+        let currentFilter = 'Semua';
+        let searchQuery = '';
+        let activePin = null;
+
+        // Categories List
+        const categories = ['Semua', 'Fotografi', 'Arsitektur', 'Alam', 'Desain', 'Kuliner'];
+
+        // Editor States
+        let editorState = {
+            sourceUrl: '',
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            blur: 0,
+            sepia: 0,
+            hue: 0,
+            rotate: 0,
+            flipH: 1,
+            flipV: 1,
+            overlayText: ''
+        };
+
+        // DOM Elements
+        const pinsGrid = document.getElementById('pinsGrid');
+        const emptyState = document.getElementById('emptyState');
+        const categoryContainer = document.getElementById('categoryContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+
+        // Modal Detail Elements
+        const pinModal = document.getElementById('pinModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalCategoryTag = document.getElementById('modalCategoryTag');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalAuthorName = document.getElementById('modalAuthorName');
+        const modalAuthorAvatar = document.getElementById('modalAuthorAvatar');
+        const modalLikeBtn = document.getElementById('modalLikeBtn');
+        const modalLikeIcon = document.getElementById('modalLikeIcon');
+        const modalSaveBtn = document.getElementById('modalSaveBtn');
+        const modalShareBtn = document.getElementById('modalShareBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Editor Elements
+        const editorModal = document.getElementById('editorModal');
+        const closeEditorModalBtn = document.getElementById('closeEditorModal');
+        const editorPreviewImg = document.getElementById('editorPreviewImg');
+        const editorOverlayTextDisplay = document.getElementById('editorOverlayTextDisplay');
+        const openHeaderEditorBtn = document.getElementById('openHeaderEditorBtn');
+        const modalEditBtn = document.getElementById('modalEditBtn');
+
+        // Editor Sliders & Controls
+        const sliderBrightness = document.getElementById('sliderBrightness');
+        const sliderContrast = document.getElementById('sliderContrast');
+        const sliderSaturation = document.getElementById('sliderSaturation');
+        const sliderBlur = document.getElementById('sliderBlur');
+        const sliderSepia = document.getElementById('sliderSepia');
+        const sliderHue = document.getElementById('sliderHue');
+        const editorTextInput = document.getElementById('editorTextInput');
+
+        const valBrightness = document.getElementById('valBrightness');
+        const valContrast = document.getElementById('valContrast');
+        const valSaturation = document.getElementById('valSaturation');
+        const valBlur = document.getElementById('valBlur');
+        const valSepia = document.getElementById('valSepia');
+        const valHue = document.getElementById('valHue');
+
+        // Upload Modal Elements
+        const uploadModal = document.getElementById('uploadModal');
+        const openUploadModalBtn = document.getElementById('openUploadModalBtn');
+        const closeUploadModalBtn = document.getElementById('closeUploadModal');
+        const uploadForm = document.getElementById('uploadForm');
+
+        // Toast Element
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // Render Category Chips
+        function renderCategories() {
+            categoryContainer.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" 
+                    class="px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition duration-200 ${
+                        currentFilter === cat 
+                        ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-md' 
+                        : 'bg-gray-100 hover:bg-gray-200 dark:bg-musake-cardDark dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
+                    }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        // Filter Function
+        window.filterCategory = function(cat) {
+            currentFilter = cat;
+            renderCategories();
+            renderPins();
+        };
+
+        // Render Masonry Cards with "Edit" Button Overlay
+        function renderPins() {
+            const filteredPins = pinsData.filter(pin => {
+                const matchesCategory = currentFilter === 'Semua' || pin.category.toLowerCase() === currentFilter.toLowerCase();
+                const matchesSearch = pin.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      pin.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      pin.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      pin.author.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filteredPins.length === 0) {
+                pinsGrid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            pinsGrid.innerHTML = filteredPins.map(pin => `
+                <div class="masonry-item group relative rounded-3xl overflow-hidden bg-white dark:bg-musake-cardDark cursor-pointer transition transform duration-300 hover:-translate-y-1.5 border border-gray-100 dark:border-gray-800/80 shadow-sm hover:shadow-xl hover:shadow-musake-600/10"
+                     onclick="openModal('${pin.id}')">
+                    
+                    <!-- Image -->
+                    <img src="${pin.imageUrl}" alt="${pin.title}" class="w-full h-auto object-cover rounded-3xl group-hover:scale-105 transition duration-500 ease-out" loading="lazy">
+
+                    <!-- Overlay Hover -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between pointer-events-none">
+                        
+                        <!-- Top Bar -->
+                        <div class="flex justify-between items-center pointer-events-auto">
+                            <span class="text-[11px] font-bold text-white bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">
+                                ${pin.category}
+                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="event.stopPropagation(); openPhotoEditor('${pin.imageUrl}')" 
+                                    class="p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white transition text-xs" title="Edit Foto Ini">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </button>
+                                <button onclick="event.stopPropagation(); toggleSave('${pin.id}')" 
+                                    class="px-4 py-2 rounded-full font-bold text-xs transition transform active:scale-95 shadow ${
+                                        pin.isSaved 
+                                        ? 'bg-white text-gray-900' 
+                                        : 'bg-musake-600 hover:bg-musake-700 text-white'
+                                    }">
+                                    ${pin.isSaved ? 'Tersimpan' : 'Simpan'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Bar -->
+                        <div class="flex justify-between items-end pointer-events-auto">
+                            <div>
+                                <h4 class="text-white font-bold text-sm line-clamp-1">${pin.title}</h4>
+                                <div class="flex items-center gap-2 text-gray-300 text-xs mt-1">
+                                    <img src="${pin.authorAvatar}" class="w-5 h-5 rounded-full object-cover">
+                                    <span class="truncate max-w-[100px]">${pin.author}</span>
+                                </div>
+                            </div>
+
+                            <button onclick="event.stopPropagation(); toggleLike('${pin.id}')" 
+                                class="p-2.5 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white transition">
+                                <i class="${pin.isLiked ? 'fa-solid text-red-500' : 'fa-regular'} fa-heart text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open Modal Detail Pin
+        window.openModal = function(pinId) {
+            activePin = pinsData.find(p => p.id === pinId);
+            if (!activePin) return;
+
+            modalImage.src = activePin.imageUrl;
+            if (modalCategoryTag) modalCategoryTag.textContent = activePin.category;
+            if (modalTitle) modalTitle.textContent = activePin.title;
+            if (modalDescription) modalDescription.textContent = activePin.description;
+            if (modalAuthorName) modalAuthorName.textContent = activePin.author;
+            if (modalAuthorAvatar) modalAuthorAvatar.src = activePin.authorAvatar;
+            if (downloadBtn) downloadBtn.href = activePin.imageUrl;
+
+            updateModalButtonsState();
+            pinModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        function closeModal() {
+            pinModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateModalButtonsState() {
+            if (!activePin) return;
+            if (modalLikeIcon) {
+                modalLikeIcon.className = activePin.isLiked ? 'fa-solid fa-heart text-red-500 text-xl' : 'fa-regular fa-heart text-xl';
+            }
+            if (modalSaveBtn) {
+                modalSaveBtn.innerHTML = `<span>${activePin.isSaved ? 'Tersimpan' : 'Simpan'}</span>`;
+                modalSaveBtn.className = activePin.isSaved 
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-5 py-2 rounded-full font-semibold transition text-sm'
+                    : 'bg-musake-600 hover:bg-musake-700 text-white px-5 py-2 rounded-full font-semibold transition text-sm shadow-md shadow-musake-600/30';
+            }
+        }
+
+        window.toggleSave = function(pinId) {
+            const pin = pinsData.find(p => p.id === pinId);
+            if (pin) {
+                pin.isSaved = !pin.isSaved;
+                if (activePin && activePin.id === pinId) updateModalButtonsState();
+                renderPins();
+                showToast(pin.isSaved ? 'Foto disimpan ke koleksi Anda' : 'Foto dihapus dari simpanan');
+            }
+        };
+
+        window.toggleLike = function(pinId) {
+            const pin = pinsData.find(p => p.id === pinId);
+            if (pin) {
+                pin.isLiked = !pin.isLiked;
+                pin.likes += pin.isLiked ? 1 : -1;
+                if (activePin && activePin.id === pinId) updateModalButtonsState();
+                renderPins();
+            }
+        };
+
+        // Open Photo Editor Workspace
+        function openPhotoEditor(imageUrl) {
+            editorState.sourceUrl = imageUrl || (activePin ? activePin.imageUrl : pinsData[0].imageUrl);
+            editorPreviewImg.src = editorState.sourceUrl;
+            resetEditorFilters();
+            
+            if (!pinModal.classList.contains('hidden')) {
+                closeModal();
+            }
+
+            editorModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Apply Realtime CSS Filters & Transform to Preview Image
+        function applyEditorStyles() {
+            editorPreviewImg.style.filter = `
+                brightness(${editorState.brightness}%) 
+                contrast(${editorState.contrast}%) 
+                saturate(${editorState.saturation}%) 
+                blur(${editorState.blur}px) 
+                sepia(${editorState.sepia}%) 
+                hue-rotate(${editorState.hue}deg)
+            `;
+
+            editorPreviewImg.style.transform = `
+                rotate(${editorState.rotate}deg) 
+                scaleX(${editorState.flipH}) 
+                scaleY(${editorState.flipV})
+            `;
+
+            // Update Text Overlay
+            if (editorState.overlayText) {
+                editorOverlayTextDisplay.textContent = editorState.overlayText;
+                editorOverlayTextDisplay.classList.remove('hidden');
+            } else {
+                editorOverlayTextDisplay.classList.add('hidden');
+            }
+
+            // Update Label Text Values
+            valBrightness.textContent = `${editorState.brightness}%`;
+            valContrast.textContent = `${editorState.contrast}%`;
+            valSaturation.textContent = `${editorState.saturation}%`;
+            valBlur.textContent = `${editorState.blur}px`;
+            valSepia.textContent = `${editorState.sepia}%`;
+            valHue.textContent = `${editorState.hue}°`;
+        }
+
+        // Preset Filters
+        window.applyPreset = function(presetName) {
+            resetEditorFilters(false);
+            switch (presetName) {
+                case 'vintage':
+                    editorState.sepia = 50;
+                    editorState.brightness = 90;
+                    editorState.contrast = 110;
+                    editorState.saturation = 80;
+                    break;
+                case 'cyberpunk':
+                    editorState.hue = 180;
+                    editorState.saturation = 180;
+                    editorState.contrast = 130;
+                    break;
+                case 'bw':
+                    editorState.saturation = 0;
+                    editorState.contrast = 140;
+                    break;
+                case 'warm':
+                    editorState.sepia = 20;
+                    editorState.brightness = 105;
+                    editorState.hue = 15;
+                    break;
+                case 'cool':
+                    editorState.hue = 190;
+                    editorState.saturation = 120;
+                    break;
+                case 'dramatic':
+                    editorState.contrast = 160;
+                    editorState.brightness = 85;
+                    editorState.saturation = 110;
+                    break;
+                default: // 'original'
+                    break;
+            }
+            syncSlidersWithState();
+            applyEditorStyles();
+        };
+
+        // Sync Range Input Elements with State
+        function syncSlidersWithState() {
+            sliderBrightness.value = editorState.brightness;
+            sliderContrast.value = editorState.contrast;
+            sliderSaturation.value = editorState.saturation;
+            sliderBlur.value = editorState.blur;
+            sliderSepia.value = editorState.sepia;
+            sliderHue.value = editorState.hue;
+        }
+
+        // Reset Filters & Transform
+        function resetEditorFilters(resetRotation = true) {
+            editorState.brightness = 100;
+            editorState.contrast = 100;
+            editorState.saturation = 100;
+            editorState.blur = 0;
+            editorState.sepia = 0;
+            editorState.hue = 0;
+            
+            if (resetRotation) {
+                editorState.rotate = 0;
+                editorState.flipH = 1;
+                editorState.flipV = 1;
+                editorState.overlayText = '';
+                editorTextInput.value = '';
+            }
+
+            syncSlidersWithState();
+            applyEditorStyles();
+        }
+
+        // Render Canvas for Export (Generates High-Res Image with applied edits)
+        function renderCanvasEditedImage(callback) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            img.onload = () => {
+                const isRotated90 = Math.abs(editorState.rotate % 180) === 90;
+                canvas.width = isRotated90 ? img.height : img.width;
+                canvas.height = isRotated90 ? img.width : img.height;
+
+                ctx.save();
+
+                // Center Origin for Rotation and Flipping
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate((editorState.rotate * Math.PI) / 180);
+                ctx.scale(editorState.flipH, editorState.flipV);
+
+                // Apply CSS Filters to Canvas Context
+                ctx.filter = `
+                    brightness(${editorState.brightness}%) 
+                    contrast(${editorState.contrast}%) 
+                    saturate(${editorState.saturation}%) 
+                    blur(${editorState.blur}px) 
+                    sepia(${editorState.sepia}%) 
+                    hue-rotate(${editorState.hue}deg)
+                `;
+
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                ctx.restore();
+
+                // Draw Overlay Text if present
+                if (editorState.overlayText) {
+                    ctx.save();
+                    const fontSize = Math.max(24, Math.floor(canvas.width / 20));
+                    ctx.font = `bold ${fontSize}px Plus Jakarta Sans, sans-serif`;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowOffsetY = 4;
+                    ctx.fillText(editorState.overlayText, canvas.width / 2, canvas.height - (fontSize * 1.5));
+                    ctx.restore();
+                }
+
+                callback(canvas.toDataURL('image/png'));
+            };
+
+            img.src = editorState.sourceUrl;
+        }
+
+        // Show Toast Notification
+        function showToast(msg) {
+            toastMessage.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Setup All Event Listeners
+        function setupEventListeners() {
+            // Search Input
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                if (searchQuery.length > 0) {
+                    clearSearchBtn.classList.remove('hidden');
+                } else {
+                    clearSearchBtn.classList.add('hidden');
+                }
+                renderPins();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.classList.add('hidden');
+                renderPins();
+            });
+
+            // Dark Mode Toggle
+            darkModeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+
+            // Close Pin Detail Modal
+            closeModalBtn.addEventListener('click', closeModal);
+            pinModal.addEventListener('click', (e) => {
+                if (e.target === pinModal) closeModal();
+            });
+
+            if (modalLikeBtn) {
+                modalLikeBtn.addEventListener('click', () => {
+                    if (activePin) toggleLike(activePin.id);
+                });
+            }
+
+            if (modalSaveBtn) {
+                modalSaveBtn.addEventListener('click', () => {
+                    if (activePin) toggleSave(activePin.id);
+                });
+            }
+
+            if (modalShareBtn) {
+                modalShareBtn.addEventListener('click', () => {
+                    if (activePin) {
+                        const dummy = document.createElement('input');
+                        document.body.appendChild(dummy);
+                        dummy.value = activePin.imageUrl;
+                        dummy.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(dummy);
+                        showToast('Tautan gambar berhasil disalin!');
+                    }
+                });
+            }
+
+            // Open Editor Triggers
+            openHeaderEditorBtn.addEventListener('click', () => {
+                openPhotoEditor(pinsData[0].imageUrl);
+            });
+
+            if (modalEditBtn) {
+                modalEditBtn.addEventListener('click', () => {
+                    if (activePin) openPhotoEditor(activePin.imageUrl);
+                });
+            }
+
+            closeEditorModalBtn.addEventListener('click', () => {
+                editorModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Sliders Live Handlers
+            sliderBrightness.addEventListener('input', (e) => { editorState.brightness = e.target.value; applyEditorStyles(); });
+            sliderContrast.addEventListener('input', (e) => { editorState.contrast = e.target.value; applyEditorStyles(); });
+            sliderSaturation.addEventListener('input', (e) => { editorState.saturation = e.target.value; applyEditorStyles(); });
+            sliderBlur.addEventListener('input', (e) => { editorState.blur = e.target.value; applyEditorStyles(); });
+            sliderSepia.addEventListener('input', (e) => { editorState.sepia = e.target.value; applyEditorStyles(); });
+            sliderHue.addEventListener('input', (e) => { editorState.hue = e.target.value; applyEditorStyles(); });
+            
+            editorTextInput.addEventListener('input', (e) => {
+                editorState.overlayText = e.target.value.trim();
+                applyEditorStyles();
+            });
+
+            // Quick Transform Buttons
+            document.getElementById('rotateLeftBtn').addEventListener('click', () => { editorState.rotate -= 90; applyEditorStyles(); });
+            document.getElementById('rotateRightBtn').addEventListener('click', () => { editorState.rotate += 90; applyEditorStyles(); });
+            document.getElementById('flipHBtn').addEventListener('click', () => { editorState.flipH *= -1; applyEditorStyles(); });
+            document.getElementById('flipVBtn').addEventListener('click', () => { editorState.flipV *= -1; applyEditorStyles(); });
+            document.getElementById('resetEditorBtn').addEventListener('click', () => { resetEditorFilters(true); });
+
+            // Export Actions
+            document.getElementById('downloadEditedImageBtn').addEventListener('click', () => {
+                renderCanvasEditedImage((dataUrl) => {
+                    const link = document.createElement('a');
+                    link.download = `musake-edited-${Date.now()}.png`;
+                    link.href = dataUrl;
+                    link.click();
+                    showToast('Foto hasil edit berhasil diunduh!');
+                });
+            });
+
+            document.getElementById('saveEditedToGalleryBtn').addEventListener('click', () => {
+                renderCanvasEditedImage((dataUrl) => {
+                    const editedPin = {
+                        id: 'm-edited-' + Date.now(),
+                        title: 'Hasil Edit Studio',
+                        description: 'Foto disunting menggunakan musake project Photo Studio.',
+                        category: 'Desain',
+                        imageUrl: dataUrl,
+                        author: 'Kreator Musake',
+                        authorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+                        likes: 1,
+                        isLiked: true,
+                        isSaved: true,
+                        comments: ['Diedit menggunakan Studio Musake.']
+                    };
+
+                    pinsData.unshift(editedPin);
+                    renderPins();
+
+                    editorModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+
+                    showToast('Karya hasil edit berhasil ditambahkan ke galeri musake project!');
+                });
+            });
+
+            // Upload Modal Actions
+            openUploadModalBtn.addEventListener('click', () => {
+                uploadModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeUploadModalBtn.addEventListener('click', () => {
+                uploadModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+
+            uploadForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newPin = {
+                    id: 'pin-' + Date.now(),
+                    title: document.getElementById('uploadTitle').value.trim(),
+                    description: document.getElementById('uploadDescription').value.trim() || 'Tidak ada deskripsi.',
+                    category: document.getElementById('uploadCategory').value,
+                    imageUrl: document.getElementById('uploadUrl').value.trim(),
+                    author: document.getElementById('uploadAuthor').value.trim() || 'Pengguna Musake',
+                    authorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+                    likes: 0,
+                    isLiked: false,
+                    isSaved: false,
+                    comments: []
+                };
+
+                pinsData.unshift(newPin);
+                renderPins();
+
+                uploadForm.reset();
+                uploadModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+
+                showToast('Karya baru berhasil diunggah ke musake project!');
+            });
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderPins();
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>
